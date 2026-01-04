@@ -293,54 +293,79 @@
                 <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg font-bold" id="companyTitle">Empresa</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <button onclick="showSub('cadVeiculo')" class="bg-white p-4 rounded-xl shadow-sm border hover:border-blue-500 transition-all text-left">
-                    <div class="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-blue-600"><i class="ph-fill ph-car text-xl"></i></div>
-                    <h3 class="font-bold text-slate-700">Novo Veículo</h3>
+            <div class="flex gap-1 mb-6 bg-white p-1 rounded-xl shadow-sm border">
+                <button id="btnGestorCad" onclick="toggleGestorView('cad')" class="flex-1 py-2 rounded-lg font-bold text-[11px] uppercase bg-blue-100 text-blue-700 transition-all">
+                    Cadastro
                 </button>
-                <button onclick="showSub('frotaLista')" class="bg-white p-4 rounded-xl shadow-sm border hover:border-blue-500 transition-all text-left">
-                    <div class="bg-green-100 w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-green-600"><i class="ph-fill ph-list-dashes text-xl"></i></div>
-                    <h3 class="font-bold text-slate-700">Ver Frota</h3>
+                <button id="btnGestorFleet" onclick="toggleGestorView('fleet')" class="flex-1 py-2 rounded-lg font-bold text-[11px] uppercase text-slate-500 transition-all">
+                    Frota
                 </button>
-                <button onclick="showSub('gestaoUsuarios')" class="bg-white p-4 rounded-xl shadow-sm border hover:border-blue-500 transition-all text-left">
-                    <div class="bg-purple-100 w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-purple-600"><i class="ph-fill ph-users text-xl"></i></div>
-                    <h3 class="font-bold text-slate-700">Motoristas</h3>
+                <button id="btnGestorParams" onclick="toggleGestorView('params')" class="flex-1 py-2 rounded-lg font-bold text-[11px] uppercase text-slate-500 transition-all">
+                    Parâmetros
                 </button>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-4">
-                <div class="flex items-center gap-3 mb-4">
-                    <i class="ph-bold ph-money text-2xl text-blue-600"></i>
-                    <h3 class="font-bold text-slate-800">Valor por KM Rodado</h3>
+            <div id="secGestorCad" class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="ph-bold ph-plus-circle text-blue-600"></i> Cadastrar Novo Veículo
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Placa</label>
+                            <input id="vPlate" type="text" placeholder="ABC-1234" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none uppercase">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Modelo</label>
+                            <input id="vModel" type="text" placeholder="Ex: Fiat Strada" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">KM Inicial</label>
+                            <input id="vKm" type="number" placeholder="0" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                        </div>
+                        <button onclick="registerVehicle()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-all">
+                            Salvar Veículo
+                        </button>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <input type="number" id="inputPerKmValue" step="0.01" class="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ex: 1.50">
-                    <button onclick="saveSettings()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">
-                        Salvar
-                    </button>
+            </div>
+
+            <div id="secGestorFleet" class="hidden space-y-6">
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-3 ml-1 flex items-center gap-2">
+                        <i class="ph-bold ph-truck text-green-600"></i> Frota Atual
+                    </h3>
+                    <div id="fleetList" class="space-y-3">
+                        </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-3 ml-1 flex items-center gap-2">
+                        <i class="ph-bold ph-users text-purple-600"></i> Motoristas / Equipe
+                    </h3>
+                    <div id="usersList" class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        </div>
                 </div>
             </div>
 
-            <div id="cadVeiculo" class="bg-white p-5 rounded-2xl shadow-sm border hidden">
-                <h3 class="font-bold mb-4">Cadastrar Veículo</h3>
-                <input id="vPlate" type="text" placeholder="Placa (ABC-1234)" class="w-full border p-3 rounded-lg mb-3 uppercase">
-                <input id="vModel" type="text" placeholder="Modelo (Ex: Fiat Strada)" class="w-full border p-3 rounded-lg mb-3">
-                <input id="vKm" type="number" placeholder="KM Inicial" class="w-full border p-3 rounded-lg mb-3">
-                <button onclick="registerVehicle()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Salvar Veículo</button>
+            <div id="secGestorParams" class="hidden space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="ph-bold ph-wrench text-orange-600"></i> Configuração de Valores
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Valor Recebido por KM Rodado (R$)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="inputPerKmValue" step="0.01" class="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="1.50">
+                                <button onclick="saveSettings()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 leading-tight">Este valor será utilizado para calcular a receita bruta e o lucro das viagens finalizadas no sistema.</p>
+                    </div>
+                </div>
             </div>
-
-            <div id="frotaLista" class="hidden">
-                <h3 class="font-bold mb-4">Frota Cadastrada</h3>
-                <div id="fleetList" class="space-y-3"></div>
-            </div>
-
-            <div id="gestaoUsuarios" class="hidden">
-                <h3 class="font-bold mb-4">Equipe</h3>
-                <div id="usersList" class="bg-white rounded-xl border overflow-hidden"></div>
-            </div>
-            
-            <div id="configEmpresa" class="hidden text-center text-gray-500 py-10">Configurações em desenvolvimento...</div>
-
         </div>
 
         <div class="h-20"></div>

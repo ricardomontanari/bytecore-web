@@ -607,7 +607,40 @@ async function loadTripsHistory() {
     }
 }
 
-// 14. Função para alternar entre Histórico Recente e Viagens Finalizadas
+// 14. Função Lançamentos
+function toggleLaunchView(view) {
+    // IDs das seções
+    const sections = {
+        fuel: document.getElementById('formFuel'),
+        maint: document.getElementById('formMaint'),
+        trip: document.getElementById('formTrip')
+    };
+
+    // IDs dos botões
+    const buttons = {
+        fuel: document.getElementById('btnLaunchFuel'),
+        maint: document.getElementById('btnLaunchMaint'),
+        trip: document.getElementById('btnLaunchTrip')
+    };
+
+    // Reseta todos os botões e esconde seções
+    Object.keys(sections).forEach(key => {
+        if (sections[key]) sections[key].classList.add('hidden');
+        if (buttons[key]) {
+            buttons[key].classList.remove('bg-blue-100', 'text-blue-700');
+            buttons[key].classList.add('text-slate-500');
+        }
+    });
+
+    // Ativa a seção e o botão selecionado
+    if (sections[view]) sections[view].classList.remove('hidden');
+    if (buttons[view]) {
+        buttons[view].classList.add('bg-blue-100', 'text-blue-700');
+        buttons[view].classList.remove('text-slate-500');
+    }
+}
+
+// 15. Função Histórico
 function toggleHistoryView(view) {
     const btnRecent = document.getElementById('btnShowRecent');
     const btnTrips = document.getElementById('btnShowTrips');
@@ -639,23 +672,21 @@ function toggleHistoryView(view) {
     }
 }
 
-// 15. Função para alternar entre Abastecimento, Manutenção e Finalizar Viagem
-function toggleLaunchView(view) {
-    // IDs das seções
+// 16. Função Configurações
+function toggleGestorView(view) {
     const sections = {
-        fuel: document.getElementById('formFuel'),
-        maint: document.getElementById('formMaint'),
-        trip: document.getElementById('formTrip')
+        cad: document.getElementById('secGestorCad'),
+        fleet: document.getElementById('secGestorFleet'),
+        params: document.getElementById('secGestorParams')
     };
 
-    // IDs dos botões
     const buttons = {
-        fuel: document.getElementById('btnLaunchFuel'),
-        maint: document.getElementById('btnLaunchMaint'),
-        trip: document.getElementById('btnLaunchTrip')
+        cad: document.getElementById('btnGestorCad'),
+        fleet: document.getElementById('btnGestorFleet'),
+        params: document.getElementById('btnGestorParams')
     };
 
-    // Reseta todos os botões e esconde seções
+    // Reseta botões e esconde seções
     Object.keys(sections).forEach(key => {
         if (sections[key]) sections[key].classList.add('hidden');
         if (buttons[key]) {
@@ -664,12 +695,25 @@ function toggleLaunchView(view) {
         }
     });
 
-    // Ativa a seção e o botão selecionado
+    // Mostra a seção escolhida e ativa o botão
     if (sections[view]) sections[view].classList.remove('hidden');
     if (buttons[view]) {
         buttons[view].classList.add('bg-blue-100', 'text-blue-700');
         buttons[view].classList.remove('text-slate-500');
     }
+
+    // Carregamento de dados específicos
+    if (view === 'fleet') {
+        loadFleetList();
+        loadCompanyUsers();
+    }
+}
+
+// Ajuste na função switchTab para garantir que o gestor comece na aba de Cadastro
+// Dentro da função switchTab(tabId)
+if (tabId === 'gestor') {
+    toggleGestorView('cad'); 
+    loadCompanyData();
 }
 
 // ==================================================================
