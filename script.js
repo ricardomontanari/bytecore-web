@@ -61,6 +61,7 @@ function loadSystem() {
     fillVehicleSelectors(); // <== Carrega os veículos nos dropdowns
     loadGlobalStats();
     loadHistory(); // Carrega histórico na Home também
+    loadSettings();
 }
 
 // ==================================================================
@@ -383,7 +384,7 @@ async function registerVehicle() {
     } catch (e) { console.error(e); }
 }
 
-// 8. Dados da Empresa e Usuários
+// 8. Dados da Empresa
 async function loadCompanyData() {
     try {
         const res = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}`);
@@ -395,6 +396,7 @@ async function loadCompanyData() {
     } catch(e) { console.error(e); }
 }
 
+// 9. Dados do Usuários
 async function loadCompanyUsers() {
     try {
         const res = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/users`);
@@ -411,6 +413,40 @@ async function loadCompanyUsers() {
             }
         }
     } catch(e) { console.error(e); }
+}
+
+// 10. Dados de KM por Litro
+async function loadSettings() {
+    if (!currentUser) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/settings`);
+        const data = await response.json();
+        document.getElementById('inputPerKmValue').value = data.per_km_value;
+    } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+    }
+}
+
+async function saveSettings() {
+    const val = document.getElementById('inputPerKmValue').value;
+    if (!val) return alert("Insira um valor válido");
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                per_km_value: parseFloat(val),
+                company_id: currentUser.company_id
+            })
+        });
+
+        if (response.ok) {
+            alert("Configuração salva com sucesso!");
+        }
+    } catch (error) {
+        alert("Erro ao salvar configuração");
+    }
 }
 
 // ==================================================================
