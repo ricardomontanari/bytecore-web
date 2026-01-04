@@ -121,9 +121,8 @@ function switchTab(tabId) {
         toggleHistoryView('recent');
     }
     if (tabId === 'gestor') {
-        loadFleetList();
+        toggleGestorView('cad'); 
         loadCompanyData();
-        loadCompanyUsers();
     }
 }
 
@@ -707,13 +706,6 @@ function toggleGestorView(view) {
         loadFleetList();
         loadCompanyUsers();
     }
-}
-
-// Ajuste na função switchTab para garantir que o gestor comece na aba de Cadastro
-// Dentro da função switchTab(tabId)
-if (tabId === 'gestor') {
-    toggleGestorView('cad'); 
-    loadCompanyData();
 }
 
 // ==================================================================
