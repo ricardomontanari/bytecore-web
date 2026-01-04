@@ -42,6 +42,10 @@ window.onload = function() {
     const maintDate = document.getElementById('mDateTime');
     if (maintDate) maintDate.value = todayString;
 
+    // Preenche Finalizar Viagem
+    const tripDate = document.getElementById('tripEndDate');
+    if (tripDate) tripDate.value = todayString;
+
     // 5. CONFIGURAÇÃO DE LISTENERS DE PLACA
     
     // Para Abastecimento: NÃO preenchemos o KM (gKm) automaticamente, conforme solicitado.
@@ -483,6 +487,7 @@ async function submitCloseTrip() {
     const plate = document.getElementById('closeTripVehicle').value;
     const end_km = document.getElementById('closeTripKmFinal').value;
     const toll_cost = document.getElementById('closeTripToll').value;
+    const tripDate = document.getElementById('tripEndDate').value;
 
     if (!plate || !end_km) return alert("Preencha a Placa e o KM Final!");
 

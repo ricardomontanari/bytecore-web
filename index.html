@@ -193,23 +193,32 @@
                         
                         <div>
                             <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Descrição do Serviço</label>
-                            <input type="text" id="mDesc" placeholder="Ex: Troca de Óleo" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Data</label>
-                            <input type="date" id="mDateTime" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                            <select id="mDesc" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800">
+                                <option value="">Selecione o serviço...</option>
+                                <option value="Troca de Óleo">Troca de Óleo</option>
+                                <option value="Filtros">Filtros (Óleo/Ar/Combustível)</option>
+                                <option value="Pneus/Alinhamento">Pneus / Alinhamento</option>
+                                <option value="Freios">Sistema de Freios</option>
+                                <option value="Suspensão">Suspensão</option>
+                                <option value="Elétrica">Parte Elétrica</option>
+                                <option value="Outros">Outros</option>
+                            </select>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Valor Total</label>
-                                <input type="number" id="mTotalValue" placeholder="R$ 0.00" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                                <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Data</label>
+                                <input type="date" id="mDateTime" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-500 ml-1 uppercase">KM Atual</label>
-                                <input type="number" id="mKmInitial" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                                <input type="number" id="mKmInitial" placeholder="000000" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Valor Total (R$)</label>
+                            <input type="number" id="mTotalValue" placeholder="R$ 0.00" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
                         </div>
 
                         <button onclick="saveMaintenance()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
@@ -228,14 +237,15 @@
                             <select id="closeTripVehicle" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500"></select>
                         </div>
 
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Data</label>
-                            <input type="date" id="mDateTime" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">KM Final na Chegada</label>
-                            <input type="number" id="closeTripKmFinal" placeholder="Ex: 105200" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Data Chegada</label>
+                                <input type="date" id="tripEndDate" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 ml-1 uppercase">KM Final</label>
+                                <input type="number" id="closeTripKmFinal" placeholder="Ex: 105200" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                            </div>
                         </div>
 
                         <div>
