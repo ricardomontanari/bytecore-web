@@ -38,6 +38,7 @@ window.onload = function() {
 function loadSystem() {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
+    fillVehicleSelectors(); // <== Carrega os veículos nos dropdowns
     loadGlobalStats();
     loadHistory(); // Carrega histórico na Home também
 }
