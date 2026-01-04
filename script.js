@@ -110,7 +110,9 @@ function switchTab(tabId) {
     }
 
     // Ações Específicas por Aba
-    if (tabId === 'history') loadHistory();
+    if (tabId === 'history') {
+        toggleHistoryView('recent'); // Sempre abre em "Recentes" por padrão
+    }
     if (tabId === 'gestor') {
         loadFleetList();
         loadCompanyData();
@@ -594,6 +596,38 @@ async function loadTripsHistory() {
 
     } catch (error) {
         console.error("Erro ao carregar histórico de viagens:", error);
+    }
+}
+
+// Função para alternar entre Histórico Recente e Viagens Finalizadas
+function toggleHistoryView(view) {
+    const btnRecent = document.getElementById('btnShowRecent');
+    const btnTrips = document.getElementById('btnShowTrips');
+    const secRecent = document.getElementById('sectionRecentHistory');
+    const secTrips = document.getElementById('sectionTripsHistory');
+
+    if (view === 'recent') {
+        // Estilo dos botões
+        btnRecent.classList.add('bg-blue-100', 'text-blue-700');
+        btnRecent.classList.remove('text-slate-500');
+        btnTrips.classList.remove('bg-blue-100', 'text-blue-700');
+        btnTrips.classList.add('text-slate-500');
+
+        // Visibilidade das seções
+        secRecent.classList.remove('hidden');
+        secTrips.classList.add('hidden');
+        loadHistory(); // Recarrega os movimentos
+    } else {
+        // Estilo dos botões
+        btnTrips.classList.add('bg-blue-100', 'text-blue-700');
+        btnTrips.classList.remove('text-slate-500');
+        btnRecent.classList.remove('bg-blue-100', 'text-blue-700');
+        btnRecent.classList.add('text-slate-500');
+
+        // Visibilidade das seções
+        secTrips.classList.remove('hidden');
+        secRecent.classList.add('hidden');
+        loadTripsHistory(); // Recarrega as viagens
     }
 }
 

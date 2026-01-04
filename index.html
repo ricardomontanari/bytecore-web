@@ -241,18 +241,27 @@
         </div>
 
         <div id="history" class="tab-content hidden px-4">
-            <h2 class="text-xl font-bold text-slate-800 mb-4">Histórico Recente</h2>
-            <div id="activityHistory" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <p class="text-center text-gray-400 py-8">Carregando...</p>
+            <h2 class="text-xl font-bold text-slate-800 mb-6">Histórico</h2>
+            
+            <div class="flex gap-2 mb-6 bg-white p-1 rounded-xl shadow-sm border">
+                <button id="btnShowRecent" onclick="toggleHistoryView('recent')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-blue-100 text-blue-700 transition-all">
+                    Recentes
+                </button>
+                <button id="btnShowTrips" onclick="toggleHistoryView('trips')" class="flex-1 py-2 rounded-lg font-bold text-sm text-slate-500 transition-all">
+                    Viagens
+                </button>
             </div>
 
-            <div class="mt-8">
-                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="ph-bold ph-steering-wheel text-blue-600"></i>
-                    Viagens Finalizadas
-                </h3>
+            <div id="sectionRecentHistory" class="space-y-4">
+                <div id="activityHistory" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <p class="text-center text-gray-400 py-8">Carregando atividades...</p>
+                </div>
+            </div>
+
+            <div id="sectionTripsHistory" class="hidden space-y-4">
                 <div id="tripsList" class="space-y-4">
-                    </div>
+                    <p class="text-center text-gray-400 py-8">Carregando viagens...</p>
+                </div>
             </div>
         </div>
 
