@@ -55,16 +55,29 @@ window.onload = function() {
     if (mPlate) mPlate.addEventListener('change', (e) => fetchLastKm(e.target.value, 'mKmInitial'));
 };
 
-function loadSystem() {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('mainApp').classList.remove('hidden');
-    fillVehicleSelectors(); // <== Carrega os veículos nos dropdowns
-    loadGlobalStats();
-    loadHistory(); // Carrega histórico na Home também
-    loadSettings();
-    updateDashboardSummary();
-    loadTripsHistory();
-    fillVehicleSelects();
+async function loadSystem() {
+    if (!currentUser) return;
+
+    try {
+        // 1. Primeiro, buscamos os veículos (essencial para os seletores)
+        const response = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/vehicles`);
+        const vehiclesData = await response.json(); // Nomeado como vehiclesData para evitar conflito
+
+        // 2. Preenchemos os seletores com os dados recebidos
+        fillVehicleSelects(vehiclesData);
+
+        // 3. Agora carregamos o restante das informações
+        updateDashboardSummary();
+        loadSettings();
+        loadTripsHistory();
+        
+        // Outras funções existentes...
+        if (typeof loadMovements === 'function') loadMovements();
+        if (typeof updateExpenseChart === 'function') updateExpenseChart();
+
+    } catch (error) {
+        console.error("Erro ao carregar sistema:", error);
+    }
 }
 
 // ==================================================================
@@ -515,15 +528,18 @@ async function updateDashboardSummary() {
         const response = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/dashboard-summary`);
         const data = await response.json();
 
-        // Atualiza os elementos no HTML (IDs que criamos no passo anterior)
-        document.getElementById('monthlyProfitDisplay').innerText = 
-            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.total_profit);
-        
-        document.getElementById('monthlyRevenueDisplay').innerText = 
-            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.total_revenue);
-            
-        document.getElementById('monthlyExpensesDisplay').innerText = 
-            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.total_expenses);
+        // Elementos do Dashboard
+        const elProfit = document.getElementById('monthlyProfitDisplay');
+        const elRev = document.getElementById('monthlyRevenueDisplay');
+        const elExp = document.getElementById('monthlyExpensesDisplay');
+
+        // Formatador de moeda
+        const btcCurrency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Só atualiza se o elemento existir no HTML
+        if (elProfit) elProfit.innerText = btcCurrency.format(data.total_profit || 0);
+        if (elRev) elRev.innerText = btcCurrency.format(data.total_revenue || 0);
+        if (elExp) elExp.innerText = btcCurrency.format(data.total_expenses || 0);
 
     } catch (error) {
         console.error("Erro ao atualizar dashboard:", error);
@@ -580,14 +596,22 @@ async function loadTripsHistory() {
 }
 
 // 14. View de veiculos
-async function fillVehicleSelects(vehicles) {
-    const mainSelect = document.getElementById('vPlate'); // seu select antigo
-    const closeSelect = document.getElementById('closeTripVehicle'); // novo select
+function fillVehicleSelects(data) {
+    if (!data || !Array.isArray(data)) return;
+
+    // IDs corretos conforme seu HTML
+    const fuelSelect = document.getElementById('gPlate');
+    const maintSelect = document.getElementById('mPlate');
+    const closeSelect = document.getElementById('closeTripVehicle'); 
     
-    const options = vehicles.map(v => `<option value="${v.plate}">${v.plate} - ${v.model}</option>`).join('');
+    const options = data.map(v => `<option value="${v.plate}">${v.plate} - ${v.model}</option>`).join('');
     
-    if(mainSelect) mainSelect.innerHTML = options;
-    if(closeSelect) closeSelect.innerHTML = options;
+    // Adiciona uma opção vazia no início
+    const defaultOption = '<option value="">Selecione...</option>';
+
+    if (fuelSelect) fuelSelect.innerHTML = defaultOption + options;
+    if (maintSelect) maintSelect.innerHTML = defaultOption + options;
+    if (closeSelect) closeSelect.innerHTML = defaultOption + options;
 }
 
 // ==================================================================
