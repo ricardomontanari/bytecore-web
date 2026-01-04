@@ -110,8 +110,11 @@ function switchTab(tabId) {
     }
 
     // Ações Específicas por Aba
+    if (tabId === 'launch') {
+        toggleLaunchView('fuel');
+    }
     if (tabId === 'history') {
-        toggleHistoryView('recent'); // Sempre abre em "Recentes" por padrão
+        toggleHistoryView('recent');
     }
     if (tabId === 'gestor') {
         loadFleetList();
@@ -599,7 +602,7 @@ async function loadTripsHistory() {
     }
 }
 
-// Função para alternar entre Histórico Recente e Viagens Finalizadas
+// 14. Função para alternar entre Histórico Recente e Viagens Finalizadas
 function toggleHistoryView(view) {
     const btnRecent = document.getElementById('btnShowRecent');
     const btnTrips = document.getElementById('btnShowTrips');
@@ -628,6 +631,39 @@ function toggleHistoryView(view) {
         secTrips.classList.remove('hidden');
         secRecent.classList.add('hidden');
         loadTripsHistory(); // Recarrega as viagens
+    }
+}
+
+// 15. Função para alternar entre Abastecimento, Manutenção e Finalizar Viagem
+function toggleLaunchView(view) {
+    // IDs das seções
+    const sections = {
+        fuel: document.getElementById('formFuel'),
+        maint: document.getElementById('formMaint'),
+        trip: document.getElementById('sectionTripClose')
+    };
+
+    // IDs dos botões
+    const buttons = {
+        fuel: document.getElementById('btnLaunchFuel'),
+        maint: document.getElementById('btnLaunchMaint'),
+        trip: document.getElementById('btnLaunchTrip')
+    };
+
+    // Reseta todos os botões e esconde seções
+    Object.keys(sections).forEach(key => {
+        if (sections[key]) sections[key].classList.add('hidden');
+        if (buttons[key]) {
+            buttons[key].classList.remove('bg-blue-100', 'text-blue-700');
+            buttons[key].classList.add('text-slate-500');
+        }
+    });
+
+    // Ativa a seção e o botão selecionado
+    if (sections[view]) sections[view].classList.remove('hidden');
+    if (buttons[view]) {
+        buttons[view].classList.add('bg-blue-100', 'text-blue-700');
+        buttons[view].classList.remove('text-slate-500');
     }
 }
 

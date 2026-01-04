@@ -122,13 +122,16 @@
 
         <div id="launch" class="tab-content hidden px-4">
             <h2 class="text-xl font-bold text-slate-800 mb-6">Novo Registro</h2>
-            
-            <div class="flex gap-2 mb-6 bg-white p-1 rounded-xl shadow-sm border">
-                <button onclick="document.getElementById('formFuel').classList.remove('hidden'); document.getElementById('formMaint').classList.add('hidden'); this.classList.add('bg-blue-100','text-blue-700'); this.nextElementSibling.classList.remove('bg-blue-100','text-blue-700')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-blue-100 text-blue-700 transition-all">
+    
+            <div class="flex gap-1 mb-6 bg-white p-1 rounded-xl shadow-sm border overflow-x-auto no-scrollbar">
+                <button id="btnLaunchFuel" onclick="toggleLaunchView('fuel')" class="flex-1 py-2 px-2 rounded-lg font-bold text-[11px] uppercase bg-blue-100 text-blue-700 transition-all whitespace-nowrap">
                     Abastecimento
                 </button>
-                <button onclick="document.getElementById('formMaint').classList.remove('hidden'); document.getElementById('formFuel').classList.add('hidden'); this.classList.add('bg-blue-100','text-blue-700'); this.previousElementSibling.classList.remove('bg-blue-100','text-blue-700')" class="flex-1 py-2 rounded-lg font-bold text-sm text-slate-500 transition-all">
+                <button id="btnLaunchMaint" onclick="toggleLaunchView('maint')" class="flex-1 py-2 px-2 rounded-lg font-bold text-[11px] uppercase text-slate-500 transition-all whitespace-nowrap">
                     Manutenção
+                </button>
+                <button id="btnLaunchTrip" onclick="toggleLaunchView('trip')" class="flex-1 py-2 px-2 rounded-lg font-bold text-[11px] uppercase text-slate-500 transition-all whitespace-nowrap">
+                    Finalizar Viagem
                 </button>
             </div>
 
@@ -204,38 +207,36 @@
                 </button>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <i class="ph-bold ph-flag-checkered text-green-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800">Finalizar Viagem</h3>
-                        <p class="text-xs text-slate-400">Cálculo de KM/L e Lucro Líquido</p>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Veículo</label>
-                        <select id="closeTripVehicle" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500">
-                            </select>
+            <div id="sectionTripClose" class="hidden space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="ph-bold ph-flag-checkered text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Finalizar Viagem</h3>
+                            <p class="text-xs text-slate-400">Cálculo de KM/L e Lucro</p>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 ml-1 uppercase">KM Final na Chegada</label>
-                        <input type="number" id="closeTripKmFinal" placeholder="Ex: 105200" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Veículo</label>
+                            <select id="closeTripVehicle" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">KM Final na Chegada</label>
+                            <input type="number" id="closeTripKmFinal" placeholder="Ex: 105200" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Total em Pedágios (R$)</label>
+                            <input type="number" id="closeTripToll" step="0.01" placeholder="0,00" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                        </div>
+                        <button onclick="submitCloseTrip()" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-calculator"></i>
+                            Calcular e Finalizar
+                        </button>
                     </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 ml-1 uppercase">Total Gasto em Pedágios (R$)</label>
-                        <input type="number" id="closeTripToll" step="0.01" placeholder="0,00" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500">
-                    </div>
-
-                    <button onclick="submitCloseTrip()" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-100 flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-calculator"></i>
-                        Calcular e Finalizar
-                    </button>
                 </div>
             </div>
         </div>
