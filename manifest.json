@@ -1,0 +1,16 @@
+{
+  "short_name": "ByteCore",
+  "name": "ByteCore Fleet - Gestão de Frota",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2055/2055240.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#1E293B",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#2563EB"
+}

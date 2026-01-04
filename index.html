@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ByteCore Fleet</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Estilos para esconder barra de rolagem mas permitir scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-content { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 pb-24">
+
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ph-fill ph-truck text-4xl text-blue-600"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">ByteCore Fleet</h1>
+                <p class="text-slate-500">Gestão Inteligente de Frotas</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email Corporativo</label>
+                    <input type="email" id="email" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="seu@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Senha</label>
+                    <input type="password" id="password" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="••••••••">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition-colors">
+                    Entrar no Sistema
+                </button>
+            </div>
+            <p class="text-center text-xs text-slate-400 mt-6">Versão 2.0 - Cloud Render</p>
+        </div>
+    </div>
+
+    <div id="mainApp" class="hidden">
+        
+        <header class="bg-white p-4 shadow-sm fixed top-0 w-full z-40 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold">BF</div>
+                <div>
+                    <h1 class="font-bold text-slate-800 leading-tight">Olá, Motorista</h1>
+                    <p class="text-xs text-slate-500" id="headerDate">ByteCore Fleet</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="text-red-500 hover:bg-red-50 p-2 rounded-lg">
+                <i class="ph-bold ph-sign-out text-xl"></i>
+            </button>
+        </header>
+
+        <div class="h-20"></div>
+
+        <div id="dashboard" class="tab-content px-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-lg relative overflow-hidden">
+                    <i class="ph-fill ph-drop absolute -right-2 -bottom-2 text-6xl opacity-20"></i>
+                    <p class="text-blue-100 text-sm mb-1">Litros (Mês)</p>
+                    <h3 class="text-3xl font-bold" id="totalLiters">0.0</h3>
+                    <p class="text-xs opacity-80 mt-1">Total abastecido</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                    <i class="ph-fill ph-currency-dollar absolute -right-2 -bottom-2 text-6xl text-green-100"></i>
+                    <p class="text-slate-500 text-sm mb-1">Gastos (Mês)</p>
+                    <h3 class="text-2xl font-bold text-slate-800" id="totalCost">R$ 0</h3>
+                    <p class="text-xs text-green-600 mt-1 font-bold">Ver detalhes</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="ph-fill ph-chart-pie-slice text-blue-600"></i> Perfil de Despesas
+                </h3>
+                <div class="h-48 flex items-center justify-center">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+
+            <button onclick="switchTab('launch')" class="w-full bg-slate-800 text-white p-4 rounded-2xl shadow-lg flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="ph-fill ph-plus text-xl"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-bold">Novo Lançamento</p>
+                        <p class="text-xs text-slate-300">Registrar atividade agora</p>
+                    </div>
+                </div>
+                <i class="ph-bold ph-caret-right"></i>
+            </button>
+        </div>
+
+        <div id="launch" class="tab-content hidden px-4">
+            <h2 class="text-xl font-bold text-slate-800 mb-6">Novo Registro</h2>
+            
+            <div class="flex gap-2 mb-6 bg-white p-1 rounded-xl shadow-sm border">
+                <button onclick="document.getElementById('formFuel').classList.remove('hidden'); document.getElementById('formMaint').classList.add('hidden'); this.classList.add('bg-blue-100','text-blue-700'); this.nextElementSibling.classList.remove('bg-blue-100','text-blue-700')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-blue-100 text-blue-700 transition-all">
+                    Abastecimento
+                </button>
+                <button onclick="document.getElementById('formMaint').classList.remove('hidden'); document.getElementById('formFuel').classList.add('hidden'); this.classList.add('bg-blue-100','text-blue-700'); this.previousElementSibling.classList.remove('bg-blue-100','text-blue-700')" class="flex-1 py-2 rounded-lg font-bold text-sm text-slate-500 transition-all">
+                    Manutenção
+                </button>
+            </div>
+
+            <div id="formFuel" class="space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Veículo</label>
+                    <select id="gPlate" class="w-full bg-transparent font-bold text-lg outline-none py-1"></select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-400 uppercase">KM Atual</label>
+                        <input type="number" id="gKm" class="w-full bg-transparent font-bold text-lg outline-none py-1" placeholder="000000">
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Litros</label>
+                        <input type="number" id="gLiters" class="w-full bg-transparent font-bold text-lg outline-none py-1" placeholder="0.0">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Preço/L</label>
+                        <input type="number" id="gPrice" class="w-full bg-transparent font-bold text-lg outline-none py-1" placeholder="R$ 0.00">
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Data</label>
+                        <input type="date" id="gDate" class="w-full bg-transparent font-bold text-sm outline-none py-2">
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <input type="file" id="gPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)">
+                    <label for="gPhoto" class="block w-full border-2 border-dashed border-slate-300 rounded-xl p-4 text-center text-slate-500 hover:bg-slate-50 cursor-pointer">
+                        <i class="ph-bold ph-camera text-2xl mb-1"></i><br>Anexar Comprovante
+                    </label>
+                    <div id="receiptPhoto" class="hidden absolute inset-0 bg-cover bg-center rounded-xl border-2 border-blue-500">
+                        <button onclick="removePhoto()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"><i class="ph-bold ph-x"></i></button>
+                    </div>
+                </div>
+
+                <button onclick="saveFuelEntry()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-lg transition-transform active:scale-95">
+                    Confirmar Abastecimento
+                </button>
+            </div>
+
+            <div id="formMaint" class="hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Veículo</label>
+                    <select id="mPlate" class="w-full bg-transparent font-bold text-lg outline-none py-1"></select>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Descrição do Serviço</label>
+                    <input type="text" id="mDesc" class="w-full bg-transparent font-bold text-lg outline-none py-1" placeholder="Ex: Troca de Óleo">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Valor Total</label>
+                        <input type="number" id="mTotalValue" class="w-full bg-transparent font-bold text-lg outline-none py-1" placeholder="R$ 0.00">
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-400 uppercase">KM Atual</label>
+                        <input type="number" id="mKmInitial" class="w-full bg-transparent font-bold text-lg outline-none py-1">
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Data</label>
+                    <input type="date" id="mDateTime" class="w-full bg-transparent font-bold text-sm outline-none py-2">
+                </div>
+                <button onclick="saveMaintenance()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg transition-transform active:scale-95">
+                    Salvar Manutenção
+                </button>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content hidden px-4">
+            <h2 class="text-xl font-bold text-slate-800 mb-4">Histórico Recente</h2>
+            <div id="activityHistory" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <p class="text-center text-gray-400 py-8">Carregando...</p>
+            </div>
+        </div>
+
+        <div id="gestor" class="tab-content hidden px-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-800">Painel do Gestor</h2>
+                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg font-bold" id="companyTitle">Empresa</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button onclick="showSub('cadVeiculo')" class="bg-white p-4 rounded-xl shadow-sm border hover:border-blue-500 transition-all text-left">
+                    <div class="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-blue-600"><i class="ph-fill ph-car text-xl"></i></div>
+                    <h3 class="font-bold text-slate-700">Novo Veículo</h3>
+                </button>
+                <button onclick="showSub('frotaLista')" class="bg-white p-4 rounded-xl shadow-sm border hover:border-blue-500 transition-all text-left">
+                    <div class="bg-green-100 w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-green-600"><i class="ph-fill ph-list-dashes text-xl"></i></div>
+                    <h3 class="font-bold text-slate-700">Ver Frota</h3>
+                </button>
+                <button onclick="showSub('gestaoUsuarios')" class="bg-white p-4 rounded-xl shadow-sm border hover:border-blue-500 transition-all text-left">
+                    <div class="bg-purple-100 w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-purple-600"><i class="ph-fill ph-users text-xl"></i></div>
+                    <h3 class="font-bold text-slate-700">Motoristas</h3>
+                </button>
+            </div>
+
+            <div id="cadVeiculo" class="bg-white p-5 rounded-2xl shadow-sm border hidden">
+                <h3 class="font-bold mb-4">Cadastrar Veículo</h3>
+                <input id="vPlate" type="text" placeholder="Placa (ABC-1234)" class="w-full border p-3 rounded-lg mb-3 uppercase">
+                <input id="vModel" type="text" placeholder="Modelo (Ex: Fiat Strada)" class="w-full border p-3 rounded-lg mb-3">
+                <input id="vKm" type="number" placeholder="KM Inicial" class="w-full border p-3 rounded-lg mb-3">
+                <button onclick="registerVehicle()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Salvar Veículo</button>
+            </div>
+
+            <div id="frotaLista" class="hidden">
+                <h3 class="font-bold mb-4">Frota Cadastrada</h3>
+                <div id="fleetList" class="space-y-3"></div>
+            </div>
+
+            <div id="gestaoUsuarios" class="hidden">
+                <h3 class="font-bold mb-4">Equipe</h3>
+                <div id="usersList" class="bg-white rounded-xl border overflow-hidden"></div>
+            </div>
+            
+            <div id="configEmpresa" class="hidden text-center text-gray-500 py-10">Configurações em desenvolvimento...</div>
+
+        </div>
+
+        <div class="h-20"></div>
+
+        <nav class="fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around py-4 z-40 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <button onclick="switchTab('dashboard')" class="flex flex-col items-center text-blue-600 font-bold transition-colors">
+                <i class="ph-fill ph-house text-2xl mb-1"></i>
+                <span class="text-[10px]">Início</span>
+            </button>
+            <button onclick="switchTab('launch')" class="flex flex-col items-center text-gray-400 hover:text-blue-500 transition-colors">
+                <i class="ph-bold ph-plus-circle text-2xl mb-1"></i>
+                <span class="text-[10px]">Lançar</span>
+            </button>
+            <button onclick="switchTab('history')" class="flex flex-col items-center text-gray-400 hover:text-blue-500 transition-colors">
+                <i class="ph-bold ph-clock-counter-clockwise text-2xl mb-1"></i>
+                <span class="text-[10px]">Histórico</span>
+            </button>
+            <button onclick="switchTab('gestor')" class="flex flex-col items-center text-gray-400 hover:text-blue-500 transition-colors">
+                <i class="ph-bold ph-gear text-2xl mb-1"></i>
+                <span class="text-[10px]">Gestor</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-95 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm" onclick="closePhotoModal()">
+        <img id="modalImage" src="" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl">
+        <button class="absolute top-6 right-6 text-white bg-white/20 rounded-full p-2 hover:bg-white/40">
+            <i class="ph-bold ph-x text-2xl"></i>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
