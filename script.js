@@ -2,6 +2,7 @@
 // CONFIGURAÇÃO GLOBAL
 // ==================================================================
 const API_BASE_URL = 'https://bytecore-fleet-api.onrender.com';
+const cors = require('cors');
 let currentUser = null;
 let expenseChart = null;
 let base64Photo = null; // Armazena a foto tirada/carregada
@@ -79,6 +80,13 @@ async function loadSystem() {
         console.error("Erro na carga do sistema:", error);
     }
 }
+
+// Configuração para permitir o seu domínio do GitHub
+app.use(cors({
+    origin: 'https://ricardomontanari.github.io',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // ==================================================================
 // NAVEGAÇÃO (ABAS)
@@ -417,13 +425,14 @@ async function registerVehicle() {
 // Função para cadastrar novo serviço
 async function registerService() {
     const nameInput = document.getElementById('sName');
-    const name = nameInput.value.trim();
+    const name = nameInput ? nameInput.value.trim() : "";
 
-    if (!name) return alert("Digite o nome do serviço!");
+    if (!name) return alert("Por favor, digite o nome do serviço.");
 
     try {
         const response = await fetch(`${API_BASE_URL}/services`, {
             method: 'POST',
+            mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 name: name, 
@@ -434,19 +443,15 @@ async function registerService() {
         if (response.ok) {
             alert("✅ Tipo de serviço cadastrado!");
             nameInput.value = "";
-            
-            if (typeof toggleAccordion === 'function') {
-                toggleAccordion('formNewService');
-            }
-            
+            toggleAccordion('formNewService');
             loadServicesList(); 
         } else {
             const err = await response.json();
-            alert("Erro ao salvar: " + (err.error || "Erro desconhecido"));
+            alert("Erro: " + (err.error || "Falha no servidor"));
         }
     } catch (error) {
         console.error("Erro ao cadastrar serviço:", error);
-        alert("Erro de conexão com o servidor.");
+        alert("Erro de CORS ou Conexão. Verifique se o servidor permite este domínio.");
     }
 }
 
