@@ -418,14 +418,15 @@ async function registerVehicle() {
 async function registerService() {
     const nameInput = document.getElementById('sName');
     const name = nameInput.value.trim();
+
     if (!name) return alert("Digite o nome do serviço!");
 
     try {
-        const r = await fetch(`${API_BASE_URL}/services`, { // Endpoint sugerido
+        const response = await fetch(`${API_BASE_URL}/services`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                name: name,
+                name: name, 
                 company_id: currentUser.company_id 
             })
         });
@@ -433,14 +434,19 @@ async function registerService() {
         if (response.ok) {
             alert("✅ Tipo de serviço cadastrado!");
             nameInput.value = "";
-            toggleAccordion('formNewService');
-            loadServicesList();
+            
+            if (typeof toggleAccordion === 'function') {
+                toggleAccordion('formNewService');
+            }
+            
+            loadServicesList(); 
         } else {
             const err = await response.json();
-            alert("Erro: " + err.error);
+            alert("Erro ao salvar: " + (err.error || "Erro desconhecido"));
         }
     } catch (error) {
         console.error("Erro ao cadastrar serviço:", error);
+        alert("Erro de conexão com o servidor.");
     }
 }
 
@@ -455,7 +461,6 @@ async function loadServicesList() {
         const selectMaint = document.getElementById('mDesc');
         if (!selectMaint) return;
 
-        // Limpa e adiciona a opção padrão
         selectMaint.innerHTML = '<option value="">Selecione o serviço...</option>';
         
         services.forEach(service => {
