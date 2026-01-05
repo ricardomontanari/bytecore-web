@@ -67,18 +67,13 @@ async function loadSystem() {
     document.getElementById('mainApp').classList.remove('hidden');
 
     try {
-        // 1. Carrega veículos (Essencial para os formulários funcionarem)
         await fillVehicleSelectors();
-
-        // 2. Carrega estatísticas básicas (Gráfico, Litros, Gastos)
         await loadGlobalStats();
-
-        // 3. Carrega os novos módulos de Lucro e Viagens
+        await loadServicesList();
         updateDashboardSummary();
         loadSettings();
         loadHistory();
         loadTripsHistory();
-        loadServicesList();
 
     } catch (error) {
         console.error("Erro na carga do sistema:", error);
@@ -421,7 +416,8 @@ async function registerVehicle() {
 
 // Função para cadastrar novo serviço
 async function registerService() {
-    const name = document.getElementById('sName').value;
+    const nameInput = document.getElementById('sName');
+    const name = nameInput.value.trim();
     if (!name) return alert("Digite o nome do serviço!");
 
     try {
@@ -434,37 +430,42 @@ async function registerService() {
             })
         });
 
-        if (r.ok) {
-            alert("Serviço cadastrado com sucesso!");
-            document.getElementById('sName').value = "";
+        if (response.ok) {
+            alert("✅ Tipo de serviço cadastrado!");
+            nameInput.value = "";
             toggleAccordion('formNewService');
-            loadServicesList(); // Atualiza os selects do sistema
+            loadServicesList();
+        } else {
+            const err = await response.json();
+            alert("Erro: " + err.error);
         }
-    } catch (err) {
-        console.error("Erro ao cadastrar serviço:", err);
+    } catch (error) {
+        console.error("Erro ao cadastrar serviço:", error);
     }
 }
 
 // Função para carregar os serviços nos campos de SELECT
 async function loadServicesList() {
+    if (!currentUser) return;
+
     try {
-        const r = await fetch(`${API_BASE_URL}/services?company_id=${currentUser.company_id}`);
-        const services = await r.json();
+        const response = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/services`);
+        const services = await response.json();
         
-        const mDescSelect = document.getElementById('mDesc');
-        if (!mDescSelect) return;
+        const selectMaint = document.getElementById('mDesc');
+        if (!selectMaint) return;
 
         // Limpa e adiciona a opção padrão
-        mDescSelect.innerHTML = '<option value="">Selecione o serviço...</option>';
+        selectMaint.innerHTML = '<option value="">Selecione o serviço...</option>';
         
-        services.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s.name;
-            opt.textContent = s.name;
-            mDescSelect.appendChild(opt);
+        services.forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.name;
+            option.textContent = service.name;
+            selectMaint.appendChild(option);
         });
-    } catch (err) {
-        console.log("Erro ao carregar serviços:", err);
+    } catch (error) {
+        console.error("Erro ao carregar lista de serviços:", error);
     }
 }
 
@@ -764,6 +765,7 @@ function toggleGestorView(view) {
 // Função para abrir/fechar painéis (Accordion)
 function toggleAccordion(elementId) {
     const content = document.getElementById(elementId);
+    if (!content) return;
     const iconMap = {
         'formNewVehicle': 'iconNewVehicle',
         'formNewService': 'iconNewService',
@@ -771,7 +773,8 @@ function toggleAccordion(elementId) {
         'listUsers': 'iconUsers'
     };
     
-    const icon = document.getElementById(iconMap[elementId]);
+    const iconId = iconMap[elementId];
+    const icon = document.getElementById(iconId);
     
     if (content.classList.contains('hidden')) {
         content.classList.remove('hidden');
