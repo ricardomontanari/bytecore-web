@@ -764,7 +764,6 @@ function toggleGestorView(view) {
 // Função para abrir/fechar painéis (Accordion)
 function toggleAccordion(elementId) {
     const content = document.getElementById(elementId);
-    const icon = document.getElementById(iconMap[elementId]);
     const iconMap = {
         'formNewVehicle': 'iconNewVehicle',
         'formNewService': 'iconNewService',
@@ -772,6 +771,7 @@ function toggleAccordion(elementId) {
         'listUsers': 'iconUsers'
     };
     
+    const icon = document.getElementById(iconMap[elementId]);
     
     if (content.classList.contains('hidden')) {
         content.classList.remove('hidden');
