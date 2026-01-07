@@ -62,7 +62,39 @@
                     Entrar no Sistema
                 </button>
             </div>
-            <p class="text-center text-xs text-slate-400 mt-6">Versão 2.0 - Cloud Render</p>
+
+            <div id="adminPanel" class="fixed inset-0 bg-slate-900 z-[90] hidden flex flex-col items-center justify-center p-6 animate-fadeIn">
+                <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border-4 border-slate-800">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="ph-fill ph-rocket text-purple-600"></i> Nova Implantação
+                        </h2>
+                        <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-red-500">
+                            <i class="ph-bold ph-x text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 overflow-y-auto max-h-[70vh]">
+                        <div class="bg-purple-50 p-3 rounded-lg border border-purple-100 mb-4">
+                            <label class="text-[10px] font-bold text-purple-700 uppercase">Chave de Acesso</label>
+                            <input type="password" id="admKey" placeholder="Senha da Equipe" class="w-full bg-transparent outline-none font-bold text-purple-900">
+                        </div>
+
+                        <p class="text-xs font-bold text-slate-400 uppercase mt-2">Dados da Empresa</p>
+                        <input type="text" id="admCompName" placeholder="Nome da Empresa (Ex: Transportadora Silva)" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm">
+                        <input type="text" id="admCompDomain" placeholder="Identificador (Ex: transpsilva)" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm lowercase">
+
+                        <p class="text-xs font-bold text-slate-400 uppercase mt-2">Dados do Gestor</p>
+                        <input type="text" id="admManName" placeholder="Nome do Gestor" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm">
+                        <input type="email" id="admManEmail" placeholder="E-mail do Gestor" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm">
+                        <input type="text" id="admManPass" placeholder="Senha Inicial" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm">
+
+                        <button onclick="runImplementation()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-bold shadow-lg mt-4 flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-check-circle"></i> Implantar Cliente
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -467,7 +499,31 @@
                         <i id="iconUsers" class="ph-bold ph-caret-down text-slate-400 transition-transform"></i>
                     </button>
                     <div id="listUsers" class="hidden p-4 border-t border-slate-50">
-                        <div id="usersList" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm"></div>
+                        <div id="listUsers" class="hidden p-4 border-t border-slate-50">
+                            <button onclick="toggleAccordion('formNewUser')" class="w-full mb-4 bg-purple-50 text-purple-700 py-3 rounded-xl font-bold border border-purple-100 flex items-center justify-center gap-2 hover:bg-purple-100">
+                                <i class="ph-bold ph-user-plus"></i> Novo Usuário
+                            </button>
+
+                            <div id="formNewUser" class="hidden bg-slate-50 p-4 rounded-xl mb-4 border border-slate-200">
+                                <div class="space-y-3">
+                                    <input type="text" id="newUserName" placeholder="Nome Completo" class="w-full p-2 rounded-lg border text-sm h-10">
+                                    <input type="email" id="newUserEmail" placeholder="E-mail de Login" class="w-full p-2 rounded-lg border text-sm h-10">
+                                    <input type="text" id="newUserPass" placeholder="Senha Provisória" class="w-full p-2 rounded-lg border text-sm h-10">
+                                    
+                                    <select id="newUserRole" class="w-full p-2 rounded-lg border text-sm bg-white h-10">
+                                        <option value="driver">Motorista</option>
+                                        <option value="manager">Gestor / Admin</option>
+                                    </select>
+                                    
+                                    <button onclick="registerUserByManager()" class="w-full bg-purple-600 text-white py-2 rounded-lg font-bold">
+                                        Cadastrar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="usersList" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

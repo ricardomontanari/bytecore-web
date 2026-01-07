@@ -1119,6 +1119,104 @@ function closeDetailsModal() {
     }
 }
 
+async function registerUserByManager() {
+    const name = document.getElementById('newUserName').value;
+    const email = document.getElementById('newUserEmail').value;
+    const password = document.getElementById('newUserPass').value;
+    const role = document.getElementById('newUserRole').value;
+
+    if (!name || !email || !password) return alert("Preencha todos os campos!");
+
+    try {
+        const r = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, role })
+        });
+
+        if (r.ok) {
+            alert("Usuário criado com sucesso!");
+            // Limpa campos
+            document.getElementById('newUserName').value = "";
+            document.getElementById('newUserEmail').value = "";
+            document.getElementById('newUserPass').value = "";
+            
+            toggleAccordion('formNewUser'); // Fecha o form
+            loadCompanyUsers(); // Recarrega a lista
+        } else {
+            const err = await r.json();
+            alert("Erro: " + err.error);
+        }
+    } catch (e) { console.error(e); }
+}
+
+// --- FUNÇÕES DE SUPER ADMIN (IMPLANTAÇÃO) ---
+
+function toggleAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+    } else {
+        panel.classList.add('hidden');
+    }
+}
+
+async function runImplementation() {
+    // Coleta dados
+    const key = document.getElementById('admKey').value;
+    const cName = document.getElementById('admCompName').value;
+    const cDomain = document.getElementById('admCompDomain').value;
+    const mName = document.getElementById('admManName').value;
+    const mEmail = document.getElementById('admManEmail').value;
+    const mPass = document.getElementById('admManPass').value;
+
+    if (!key || !cName || !cDomain || !mName || !mEmail || !mPass) {
+        return alert("Preencha TODOS os campos para implantar.");
+    }
+
+    const btn = event.currentTarget;
+    const oldText = btn.innerHTML;
+    btn.innerHTML = "Processando...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/setup-company`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_key: key,
+                company_name: cName,
+                company_domain: cDomain,
+                manager_name: mName,
+                manager_email: mEmail,
+                manager_password: mPass
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(`✅ SUCESSO!\n\n${data.message}\n\nEntregue o login ao cliente:\nEmail: ${mEmail}\nSenha: ${mPass}`);
+            toggleAdminPanel();
+            // Limpa formulário
+            document.getElementById('admCompName').value = "";
+            document.getElementById('admCompDomain').value = "";
+            document.getElementById('admManName').value = "";
+            document.getElementById('admManEmail').value = "";
+            document.getElementById('admManPass').value = "";
+        } else {
+            alert("Erro na implantação: " + data.error);
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Erro de conexão com o servidor.");
+    } finally {
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+    }
+}
+
 // ==================================================================
 // FUNÇÕES AUXILIARES (Gráficos, Fotos, Máscaras)
 // ==================================================================
