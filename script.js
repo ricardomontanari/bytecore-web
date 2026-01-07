@@ -1104,10 +1104,19 @@ function openDetailsModal(index) {
 
     content.innerHTML = html;
     modal.classList.remove('hidden');
+
+    document.body.classList.add('overflow-hidden');
 }
 
 function closeDetailsModal() {
     document.getElementById('detailsModal').classList.add('hidden');
+    
+    // CORREÇÃO DE SCROLL: Destrava o corpo do site
+    // Só destrava se o modal de foto não estiver aberto (para evitar conflito)
+    const photoModal = document.getElementById('photoModal');
+    if (photoModal.classList.contains('hidden')) {
+        document.body.classList.remove('overflow-hidden');
+    }
 }
 
 // ==================================================================
@@ -1263,17 +1272,35 @@ function removePhoto() {
 }
 
 function openPhotoModal(src) {
+    // Impede a propagação se foi clicado de dentro de outro elemento
+    if (event) event.stopPropagation();
+
     const modal = document.getElementById('photoModal');
     const img = document.getElementById('modalImage');
+    
     if (modal && img) {
         img.src = src;
         modal.classList.remove('hidden');
+        
+        // Trava o scroll (garantia extra caso abra direto)
+        document.body.classList.add('overflow-hidden');
     }
 }
 
 function closePhotoModal() {
     const modal = document.getElementById('photoModal');
     if (modal) modal.classList.add('hidden');
+
+    // LÓGICA INTELIGENTE DE SCROLL:
+    // Se o modal de Detalhes estiver aberto lá atrás, NÃO destrava o scroll do body.
+    // Se o modal de Detalhes estiver fechado, aí sim destrava.
+    const detailsModal = document.getElementById('detailsModal');
+    
+    // Se o detailsModal não existe ou está escondido, libera o scroll
+    if (!detailsModal || detailsModal.classList.contains('hidden')) {
+        document.body.classList.remove('overflow-hidden');
+    }
+    // Caso contrário (Detalhes aberto), mantém o overflow-hidden para o usuário continuar lendo o histórico sem o fundo mexer.
 }
 
 function setupInputMasks() {
