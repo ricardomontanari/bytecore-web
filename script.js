@@ -1344,19 +1344,64 @@ function renderChart(fuel, maintenance) {
     });
 }
 
+// --- FUNÇÃO DE COMPRESSÃO DE IMAGEM ---
+
+function compressImage(file, maxWidth, quality, callback) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(event) {
+        const img = new Image();
+        img.src = event.target.result;
+        
+        img.onload = function() {
+            // Cria um canvas para desenhar a imagem menor
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // Calcula novas dimensões mantendo a proporção
+            if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Converte para Base64 comprimido (JPEG com qualidade 0.7)
+            // Isso reduz uma foto de 5MB para ~100kb
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            callback(compressedDataUrl);
+        };
+    };
+}
+
+// --- FUNÇÃO ATUALIZADA DE CAPTURA ---
+
 function handlePhoto(input) {
     if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            base64Photo = e.target.result;
-            // Mostra preview
-            const preview = document.getElementById('receiptPhoto');
+        const file = input.files[0];
+        
+        // Feedback visual imediato (enquanto processa)
+        const preview = document.getElementById('receiptPhoto');
+        if (preview) {
+            preview.classList.remove('hidden');
+            preview.style.opacity = '0.5'; // Deixa meio transparente indicando carregamento
+        }
+
+        // Chama a compressão: Max 1024px largura, Qualidade 70%
+        compressImage(file, 1024, 0.7, function(compressedResult) {
+            base64Photo = compressedResult; // Salva a versão leve
+            
+            // Atualiza preview com a imagem final
             if (preview) {
                 preview.style.backgroundImage = `url(${base64Photo})`;
-                preview.classList.remove('hidden');
+                preview.style.opacity = '1';
             }
-        };
-        reader.readAsDataURL(input.files[0]);
+        });
     }
 }
 
