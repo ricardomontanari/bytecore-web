@@ -124,6 +124,25 @@
         <div class="h-20"></div>
 
         <div id="dashboard" class="tab-content px-4">
+            <div class="bg-white mx-4 -mt-4 p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-3 mb-4 relative z-10">
+                
+                <div class="relative">
+                    <i class="ph-bold ph-truck absolute left-3 top-3 text-slate-400"></i>
+                    <select id="globalVehicleFilter" onchange="applyGlobalFilters()" class="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none font-bold text-slate-700 h-10 appearance-none">
+                        <option value="all">Todos os Veículos</option>
+                        </select>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none"></i>
+                </div>
+
+                <div class="flex justify-between gap-1 bg-slate-100 p-1 rounded-lg">
+                    <button onclick="setFilterPeriod(15, this)" class="filter-period-btn flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:bg-white transition-all">15D</button>
+                    <button onclick="setFilterPeriod(30, this)" class="filter-period-btn flex-1 py-1.5 text-[10px] font-bold rounded-md bg-white text-blue-600 shadow-sm transition-all">30D</button>
+                    <button onclick="setFilterPeriod(90, this)" class="filter-period-btn flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:bg-white transition-all">3M</button>
+                    <button onclick="setFilterPeriod(180, this)" class="filter-period-btn flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:bg-white transition-all">6M</button>
+                    <button onclick="setFilterPeriod(365, this)" class="filter-period-btn flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:bg-white transition-all">1A</button>
+                </div>
+            </div>
+            
             <div class="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-3xl shadow-lg text-white mb-6">
                 <p class="text-blue-100 text-sm font-medium opacity-80">Lucro Estimado (Mês Atual)</p>
                 <h2 id="monthlyProfitDisplay" class="text-3xl font-bold mt-1">R$ 0,00</h2>
@@ -134,7 +153,7 @@
                         <span id="monthlyRevenueDisplay" class="font-bold text-xs text-green-300">R$ 0,00</span>
                     </div>
                     <div class="flex flex-col text-right">
-                        <span>Despesas</span>
+                        <p class="text-[10px] text-slate-500 uppercase">Custos Viagem</p>
                         <span id="monthlyExpensesDisplay" class="font-bold text-xs text-red-300">R$ 0,00</span>
                     </div>
                 </div>
@@ -375,7 +394,11 @@
         </div>
 
         <div id="history" class="tab-content hidden px-4">
-            <h2 class="text-xl font-bold text-slate-800 mb-6">Histórico</h2>
+            <div class="bg-white p-3 mb-2 border-b border-slate-100 sticky top-0 z-10">
+                <select id="searchPlateHistory" onchange="loadHistory()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold h-10 outline-none">
+                    <option value="all">Todos os Veículos</option>
+                </select>
+            </div>
             
             <div class="flex gap-2 mb-6 bg-white p-1 rounded-xl shadow-sm border">
                 <button id="btnShowRecent" onclick="toggleHistoryView('recent')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-blue-100 text-blue-700 transition-all">
@@ -394,6 +417,12 @@
 
             <div id="sectionTripsHistory" class="hidden space-y-4">
                 <div id="tripsList" class="space-y-4">
+                    <div class="bg-white p-3 mb-2 border-b border-slate-100 sticky top-0 z-10">
+                        <select id="searchPlateHistory" onchange="loadHistory()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold h-10 outline-none">
+                            <option value="all">Todos os Veículos</option>
+                        </select>
+                    </div>
+
                     <p class="text-center text-gray-400 py-8">Carregando viagens...</p>
                 </div>
             </div>

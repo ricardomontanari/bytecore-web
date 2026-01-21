@@ -9,6 +9,8 @@ let tempServices = [];
 let tempParts = [];
 let currentHistoryData = [];
 let currentDetailId = null;
+let currentFilterDays = 30;
+let currentFilterPlate = 'all';
 
 // ==================================================================
 // INICIALIZAÇÃO DO SISTEMA
@@ -172,28 +174,30 @@ function logout() {
 // Preencher Seletores de Veículos
 async function fillVehicleSelectors() {
     try {
-        if (!currentUser || !currentUser.company_id) return;
-
+        if (!currentUser) return;
         const r = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/vehicles`);
-        if (!r.ok) throw new Error('Falha ao buscar veículos');
-        
-        const vehiclesData = await r.json(); // Mudamos o nome para evitar conflito
-        
-        // Criamos as opções uma única vez
-        const options = vehiclesData.length > 0 
-            ? '<option value="">Escolha o Veículo</option>' + vehiclesData.map(v => `<option value="${v.plate}">${v.plate} - ${v.model}</option>`).join('')
-            : '<option value="">Nenhum veículo encontrado</option>';
+        const data = await r.json();
 
-        // Preenche todos os selects do seu HTML pelos IDs corretos
-        const targets = ['gPlate', 'mPlate', 'closeTripVehicle', 'searchPlate'];
-        targets.forEach(id => {
+        // Cria as opções
+        const optsFilter = '<option value="all">Todos os Veículos</option>' + 
+                           data.map(v => `<option value="${v.plate}">${v.plate} - ${v.model}</option>`).join('');
+        
+        const optsForm = '<option value="">Selecione...</option>' + 
+                         data.map(v => `<option value="${v.plate}">${v.plate} - ${v.model}</option>`).join('');
+
+        // IDs dos elementos que são Filtros
+        ['globalVehicleFilter', 'searchPlateHistory', 'searchPlateTrips'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = options;
+            if (el) el.innerHTML = optsFilter;
         });
 
-    } catch (e) { 
-        console.error("Erro ao carregar veículos:", e); 
-    }
+        // IDs dos elementos que são Formulários (Lançamento)
+        ['gPlate', 'mPlate', 'closeTripVehicle'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = optsForm;
+        });
+
+    } catch (e) { console.error(e); }
 }
 
 // Buscar KM Anterior (Automático)
@@ -340,6 +344,12 @@ async function loadHistory() {
         if (!currentUser) return;
         const res = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/movements`);
         const movements = await res.json();
+
+        // LÓGICA DE FILTRO CLIENT-SIDE
+        const filterVal = document.getElementById('searchPlateHistory')?.value;
+        if (filterVal && filterVal !== 'all') {
+            movements = movements.filter(m => m.plate === filterVal);
+        }
 
         // SALVA NA GLOBAL PARA O MODAL USAR
         currentHistoryData = movements;
@@ -636,26 +646,31 @@ async function submitCloseTrip() {
 // Dados do Dashboard
 async function updateDashboardSummary() {
     if (!currentUser) return;
-    
+
+    // Efeito de carregamento
+    const elProfit = document.getElementById('monthlyProfitDisplay');
+    if(elProfit) elProfit.innerText = "...";
+
     try {
-        const response = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/dashboard-summary`);
+        const url = `${API_BASE_URL}/company/${currentUser.company_id}/dashboard-summary?days=${currentFilterDays}&plate=${currentFilterPlate}`;
+        const response = await fetch(url);
         const data = await response.json();
 
-        // Elementos do Dashboard
-        const elProfit = document.getElementById('monthlyProfitDisplay');
-        const elRev = document.getElementById('monthlyRevenueDisplay');
-        const elExp = document.getElementById('monthlyExpensesDisplay');
-
-        // Formatador de moeda
         const btcCurrency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // Só atualiza se o elemento existir no HTML
-        if (elProfit) elProfit.innerText = btcCurrency.format(data.total_profit || 0);
-        if (elRev) elRev.innerText = btcCurrency.format(data.total_revenue || 0);
-        if (elExp) elExp.innerText = btcCurrency.format(data.total_expenses || 0);
+        // Atualiza na tela (com Labels atualizadas se você mudou no HTML)
+        // NOTA: No HTML, sugiro mudar o texto "Despesas" para "Custos de Viagem" para ficar claro
+        if (document.getElementById('monthlyProfitDisplay')) 
+            document.getElementById('monthlyProfitDisplay').innerText = btcCurrency.format(data.total_profit || 0);
+        
+        if (document.getElementById('monthlyRevenueDisplay')) 
+            document.getElementById('monthlyRevenueDisplay').innerText = btcCurrency.format(data.total_revenue || 0);
+        
+        if (document.getElementById('monthlyExpensesDisplay')) 
+            document.getElementById('monthlyExpensesDisplay').innerText = btcCurrency.format(data.total_custo_viagem || 0);
 
     } catch (error) {
-        console.error("Erro ao atualizar dashboard:", error);
+        console.error("Erro dashboard:", error);
     }
 }
 
@@ -668,6 +683,12 @@ async function loadTripsHistory() {
     try {
         const response = await fetch(`${API_BASE_URL}/company/${currentUser.company_id}/trips`);
         const trips = await response.json();
+
+        // LÓGICA DE FILTRO CLIENT-SIDE
+        const filterVal = document.getElementById('searchPlateTrips')?.value;
+        if (filterVal && filterVal !== 'all') {
+            trips = trips.filter(t => t.plate === filterVal);
+        }
 
         container.innerHTML = trips.map(trip => `
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
@@ -1227,6 +1248,31 @@ async function runImplementation() {
         btn.innerHTML = oldText;
         btn.disabled = false;
     }
+}
+
+// 1. Ação dos Botões de Período
+function setFilterPeriod(days, btnElement) {
+    currentFilterDays = days;
+    
+    // Atualiza estilo dos botões
+    document.querySelectorAll('.filter-period-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+        btn.classList.add('text-slate-500');
+    });
+    
+    // Ativa o botão clicado
+    btnElement.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+    btnElement.classList.remove('text-slate-500');
+
+    // Atualiza os dados
+    updateDashboardSummary();
+}
+
+// 2. Ação do Select de Veículo Global
+function applyGlobalFilters() {
+    currentFilterPlate = document.getElementById('globalVehicleFilter').value;
+    updateDashboardSummary(); // Atualiza os números de lucro
+    // Opcional: loadGlobalStats(); // Se quiser filtrar o gráfico de pizza também
 }
 
 // ==================================================================
